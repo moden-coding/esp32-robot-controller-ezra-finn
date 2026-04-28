@@ -1,9 +1,17 @@
-int triggerleft = 9;
-int echoleft = 8;
-int triggerfront = 13;
-int echofront = 12;
-int triggerright = 9;
-int echoright = 8;
+float p = 0.01;
+float d = 0.03;
+float target = 8;
+float lasterror;
+int triggerleft = 7;
+int echoleft = 6;
+int triggerfront = 18;
+int echofront = 17;
+int triggerright = 16;
+int echoright = 15;
+int rightB = 4;
+int rightA = 5;
+int leftB = 1;
+int leftA = 2;
 
 void setup() {
   Serial.begin(115200);
@@ -22,39 +30,43 @@ void loop() {
   handleOTA();
   handleWebServer();
 
+  float distancefront = getDistancefront();
+  Serial.println(distancefront);
+
+  float distanceleft = getDistanceleft();
+  Serial.println(distanceleft);
+
+  float distanceright = getDistanceright();
+  Serial.println(distanceright);
   
+  float currenterror = distanceleft - distanceright;
+
+float error = distanceleft - distanceright;
+  double difference = error * p;
+  if (difference > 1) {
+    difference = 1;
+
+
+
+  } else if (difference < -1) {
+    difference = -1;
+  }
+
+
+  leftDrive(0.7 - error * p - (currenterror - lasterror) * d);
+ rightDrive(0.7 + error * p + (currenterror - lasterror) * d);
+
+ lasterror = currenterror;
+ 
+ delay(50);
 }
+
+
+
+
 float getDistancefront() {
   digitalWrite(triggerfront, LOW);
   delayMicroseconds(2);
   digitalWrite(triggerfront, HIGH);
   delayMicroseconds(10);
-  digitalWrite(triggerfront, LOW);
-  long duration = pulseIn(echofront, HIGH);
-  float distanceCMfront = duration * 0.0343 / 2.0;
-
-  return distanceCMfront;
-}
-float getDistanceleft() {
-  digitalWrite(triggerleft, LOW);
-  delayMicroseconds(2);
-  digitalWrite(triggerleft, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(triggerleft, LOW);
-  long duration = pulseIn(echoleft, HIGH);
-  float distanceCMleft = duration * 0.0343 / 2.0;
-
-  return distanceCMleft;
-}
-
-float getDistanceright() {
-  digitalWrite(triggerright, LOW);
-  delayMicroseconds(2);
-  digitalWrite(triggerright, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(triggerright, LOW);
-  long duration = pulseIn(echoright, HIGH);
-  float distanceCMright = duration * 0.0343 / 2.0;
-
-  return distanceCMright;
-}
+  digitalWrite(trigger
